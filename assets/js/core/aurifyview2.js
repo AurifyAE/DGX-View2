@@ -316,22 +316,14 @@ async function readData() {
 async function showTable() {
     try {
         const tableData = await readData();
-        // console.log('Data read successfully:', tableData);
 
         const tableBody1 = document.getElementById('tableBodyTV1');
         const tableBody2 = document.getElementById('tableBodyTV2');
-        // console.log(tableData);
-
-        setInterval(() => {
-            var silver = silverValue
-            // Silver 1GM Table Value
-            // document.getElementById('silverBidTd').textContent = parseFloat((parseFloat(silver) + parseFloat(silverBidSpread) || 0) * 1000).toFixed(3);
-            // document.getElementById('silverAskTd').textContent = parseFloat((parseFloat(silver) + 0.5 + parseFloat(silverAskSpread) || 0) * 1000).toFixed(3);
-            //console.log(parseFloat(silver));
-        }, 1000);
 
         // Loop through the tableData
-        for (const data of tableData) {
+        for (let i = 0; i < tableData.length; i++) {
+            const data = tableData[i];
+
             // Assign values from data to variables
             const metalInput = data.data.metal;
             const purityInput = data.data.purity;
@@ -342,13 +334,8 @@ async function showTable() {
             const sellPremiumInputAED = data.data.sellPremiumAED;
             const buyPremiumInputAED = data.data.buyPremiumAED;
 
-
             // Create a new table row
-            const newRow1 = document.createElement("tr");
-            const newRow2 = document.createElement("tr");
-
-            newRow1.style.marginBottom = "25px"
-            newRow2.style.marginBottom = "25px"
+            const newRow = document.createElement("tr");
 
             displaySpreadValues();
 
@@ -369,7 +356,6 @@ async function showTable() {
                     unitMultiplier = 31.1034768;
                 }
 
-
                 let sellPremium = sellPremiumInputAED || 0;
                 let buyPremium = buyPremiumInputAED || 0;
                 let askSpreadValue = askSpread || 0;
@@ -379,11 +365,11 @@ async function showTable() {
                 let purity;
                 if (metalInput === "Gold" || metalInput === "Gold kilobar" || metalInput === "Gold TOLA" || metalInput === "Gold TEN TOLA") {
                     metalName = 'Gold';
-                }else if (metalInput === 'Minted Bar'){
+                } else if (metalInput === 'Minted Bar') {
                     metalName = 'Gold';
                 }
 
-                newRow1.innerHTML = `
+                newRow.innerHTML = `
                     <td style="text-align: right;" id="metalInput">${metalName}</td>
                     <td style="text-align: left; font-size:10px; font-weight: 600;">${purityInput}</td>
                     <td >${unitInput} ${weightInput}</td>
@@ -393,25 +379,28 @@ async function showTable() {
 
                 if (weight === "GM") {
                     // Update the sellAED and buyAED values for the current 
-                    newRow1.querySelector("#sellAED").innerText = parseFloat(((parseFloat(goldValue) + parseFloat(askSpreadValue) + parseFloat(0.5)) * unitInput * unitMultiplier * (purityInput / Math.pow(10, purityInput.length)) + parseFloat(sellPremium)).toFixed(2));
-                    newRow1.querySelector("#buyAED").innerText = ((parseFloat(goldValue) + parseFloat(bidSpreadValue)) * unitInput * unitMultiplier * (purityInput / Math.pow(10, purityInput.length)) + parseFloat(buyPremium)).toFixed(2);
+                    newRow.querySelector("#sellAED").innerText = parseFloat(((parseFloat(goldValue) + parseFloat(askSpreadValue) + parseFloat(0.5)) * unitInput * unitMultiplier * (purityInput / Math.pow(10, purityInput.length)) + parseFloat(sellPremium)).toFixed(2));
+                    newRow.querySelector("#buyAED").innerText = ((parseFloat(goldValue) + parseFloat(bidSpreadValue)) * unitInput * unitMultiplier * (purityInput / Math.pow(10, purityInput.length)) + parseFloat(buyPremium)).toFixed(2);
                 } else {
                     // Update the sellAED and buyAED values for the current row
                     const sellAEDValue = parseFloat(((parseFloat(goldValue) + parseFloat(askSpreadValue) + parseFloat(0.5)) * unitInput * unitMultiplier * (purityInput / Math.pow(10, purityInput.length)) + parseFloat(sellPremium)).toFixed(4));
                     const buyAEDValue = parseInt((parseFloat(goldValue) + parseFloat(bidSpreadValue)) * unitInput * unitMultiplier * (purityInput / Math.pow(10, purityInput.length)) + parseFloat(buyPremium)).toFixed(0);
 
-                    newRow1.querySelector("#sellAED").innerText = parseInt(sellAEDValue).toFixed(0); // Round to remove decimals
-                    newRow1.querySelector("#buyAED").innerText = parseInt(buyAEDValue).toFixed(0);   // Round to remove decimals
+                    newRow.querySelector("#sellAED").innerText = parseInt(sellAEDValue).toFixed(0); // Round to remove decimals
+                    newRow.querySelector("#buyAED").innerText = parseInt(buyAEDValue).toFixed(0);   // Round to remove decimals
                 }
-            }, 500)
+            }, 500);
 
-
-            // Append the new row to the table body
-            tableBody1.appendChild(newRow1);
-            tableBody2.appendChild(newRow1);
+            // Append the new row to the appropriate table body based on index
+            if (i < 5) {
+                tableBody1.appendChild(newRow);
+            } else {
+                tableBody2.appendChild(newRow);
+            }
         }
     } catch (error) {
         console.error('Error reading data:', error);
     }
 }
+
 
